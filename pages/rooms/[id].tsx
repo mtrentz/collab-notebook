@@ -73,27 +73,30 @@ const Room = () => {
 
 
     return (
-
         // Show error if error
         error ? (
-            <div className="flex flex-col gap-4 items-center justify-center min-h-screen py-2">
-                <h1 className="text-2xl font-bold">{error}</h1>
-                <button
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={() => router.push('/')}
-                >
-                    Go back
-                </button>
+            <div className="flex-grow">
+                <div className="flex flex-col gap-4 items-center justify-center min-h-screen py-2">
+                    <h1 className="text-2xl font-bold">{error}</h1>
+                    <button
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        onClick={() => router.push('/')}
+                    >
+                        Go back
+                    </button>
+                </div>
             </div>
         ) : (
-            // Show notepad 
-            <Notepad
-                id={room?.id || ''}
-                text={room?.text || ''}
-                saveText={save}
-                // Editable if room loaded (not null or undefined)
-                editable={room != null}
-            />
+            <div className="flex-grow w-screen">
+                {/* // Show notepad */}
+                <Notepad
+                    id={room?.id || ''}
+                    text={room?.text || ''}
+                    saveText={save}
+                    // Editable if room loaded (not null or undefined)
+                    editable={room != null}
+                />
+            </div>
         )
     )
 }

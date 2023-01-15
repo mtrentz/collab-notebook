@@ -35,19 +35,25 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
-        <div className="flex flex-col gap-4 items-center justify-center min-h-screen py-2">
+      <div className="flex-grow">
+        <div className="flex flex-col gap-4 items-center justify-start min-h-screen py-2 mt-2">
+
+          {/* Text with Welcome */}
+          <h1 className="text-4xl font-bold text-center">Welcome to <span className="text-blue-600">Collab Notepad</span></h1>
+
           {/* Button to create random room */}
+          <h2 className="text-2xl font-bold">Create a new room</h2>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             onClick={() => createRandomRoom()}
           >
-            Create Random Room
+            Create New Room
           </button>
 
           {/* Text field and button to go to room*/}
+          <h2 className="text-2xl font-bold">Or enter a room ID</h2>
           <input
-            className="border-2 border-gray-300 bg-white h-10 px-5 pr-16 rounded-lg text-sm focus:outline-none"
+            className="border-2 border-gray-300 bg-white h-10 w-72 px-2 rounded-lg text-sm focus:outline-none text-center"
             type="text"
             placeholder="Room ID"
             id="room-id"
@@ -57,10 +63,10 @@ export default function Home() {
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             onClick={() => router.push(`/rooms/${textRef.current?.value}`)}
           >
-            Get Room
+            Join Room
           </button>
         </div>
-      </main>
+      </div>
     </>
   )
 }
