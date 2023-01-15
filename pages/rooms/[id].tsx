@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Notepad from '@/components/Notepad'
 
+// Socket io stuff
+import { io } from 'socket.io-client'
+let socket: any
+
 interface Room {
     id: string
     createdAt: string
@@ -25,7 +29,7 @@ const Room = () => {
             .then((res) => res.json())
             .then((data) => {
                 // Log data
-                console.log(data)
+                // console.log(data)
 
                 // Set room
                 setRoom(data)
@@ -39,8 +43,38 @@ const Room = () => {
             })
     }
 
+    const socketInitializer = async () => {
+        await fetch('/api/socket')
+        socket = io()
+
+        socket.on('connect', () => {
+            console.log('websocket connected')
+        })
+
+        // Join room
+        socket.emit('join-room', id)
+
+        // Listen for changes of update-text
+        socket.on('text-updated', (text: string) => {
+            // log it
+            console.log("Got update text from ws", text)
+
+            // Set room
+            let updatedRoom = room
+            if (updatedRoom) {
+                updatedRoom.text = text
+            }
+            setRoom(updatedRoom)
+        })
+    }
+
     // Get room on mount
     useEffect(() => {
+        // Initialize socket if not initialized
+        if (!socket) {
+            socketInitializer()
+        }
+
         // Check if id is a string
         if (typeof id === 'string') {
             getRoomById(id)
@@ -64,10 +98,14 @@ const Room = () => {
             .then((res) => res.json())
             .then((data) => {
                 // Log data
-                console.log(data)
+                // console.log(data)
 
                 // Set room
                 setRoom(data)
+
+                // Emit update-text event
+                console.log("Emitting update-text")
+                socket.emit('update-text', text, id)
             })
     }
 

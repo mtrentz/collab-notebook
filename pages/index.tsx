@@ -18,7 +18,7 @@ export default function Home() {
       .then((res) => res.json())
       .then((data) => {
         // Log data
-        console.log(data)
+        // console.log(data)
 
         // Navigate to /rooms/:id
         router.push(`/rooms/${data.id}`)
