@@ -1,7 +1,10 @@
 import Head from 'next/head'
 import { useEffect, useState, useRef } from 'react'
+import { useRouter } from 'next/router'
 
 export default function Home() {
+
+  const router = useRouter()
 
   const createRandomRoom = () => {
     // Make POST request to /api/rooms/random
@@ -16,21 +19,9 @@ export default function Home() {
       .then((data) => {
         // Log data
         console.log(data)
-      })
-  }
 
-  // id can be null
-  const getRoomById = (id: string | null | undefined) => {
-    if (!id) {
-      return
-    }
-
-    // Make GET request to /api/rooms/:id
-    fetch(`/api/rooms/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        // Log data
-        console.log(data)
+        // Navigate to /rooms/:id
+        router.push(`/rooms/${data.id}`)
       })
   }
 
@@ -54,7 +45,7 @@ export default function Home() {
             Create Random Room
           </button>
 
-          {/* Text field and button to get room by id */}
+          {/* Text field and button to go to room*/}
           <input
             className="border-2 border-gray-300 bg-white h-10 px-5 pr-16 rounded-lg text-sm focus:outline-none"
             type="text"
@@ -64,7 +55,7 @@ export default function Home() {
           />
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={() => getRoomById(textRef?.current?.value)}
+            onClick={() => router.push(`/rooms/${textRef.current?.value}`)}
           >
             Get Room
           </button>
