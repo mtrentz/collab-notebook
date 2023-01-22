@@ -1,4 +1,5 @@
 import { Server } from 'socket.io'
+import { prisma } from '../../prisma/client'
 
 
 const SocketHandler = (
@@ -32,8 +33,24 @@ const SocketHandler = (
                 // Log it
                 console.log('User', socket.id, 'updated text in room', roomId, 'to', text)
 
-                // Broadcast to room, not to sender
-                socket.to(roomId).emit('text-updated', text)
+                // Save to database 
+                prisma.room.update({
+                    where: {
+                        id: roomId as string,
+                    },
+                    data: {
+                        text: text,
+                    },
+                })
+                    .then((room) => {
+                        console.log('Saved text to database')
+                        // Broadcast to room, not to sender
+                        socket.to(roomId).emit('text-updated', text)
+                    })
+                    .catch((err) => {
+                        console.log('Error saving text to database', err)
+                    })
+
             })
         })
 

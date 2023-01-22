@@ -88,30 +88,40 @@ const Room = () => {
         }
     }, [room])
 
+    // Update function to change state and emit event
+    const updateText = (text: string) => {
+        // Update text
+        setTextState(text)
 
-    // Save text to database
-    const save = (text: string, id: string) => {
-        // PUT request to /api/rooms/:id
-        fetch(`/api/rooms/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ text }),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                // Log data
-                // console.log(data)
-
-                // Set room
-                setRoom(data)
-
-                // // Emit update-text event
-                console.log("Emitting update-text to room", id)
-                socket.emit('update-text', id, text)
-            })
+        // Emit update-text event
+        console.log("Emitting update-text to room", id)
+        socket.emit('update-text', id, text)
     }
+
+
+    // // Save text to database
+    // const save = (text: string, id: string) => {
+    //     // PUT request to /api/rooms/:id
+    //     fetch(`/api/rooms/${id}`, {
+    //         method: 'PUT',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify({ text }),
+    //     })
+    //         .then((res) => res.json())
+    //         .then((data) => {
+    //             // Log data
+    //             // console.log(data)
+
+    //             // Set room
+    //             setRoom(data)
+
+    //             // // Emit update-text event
+    //             console.log("Emitting update-text to room", id)
+    //             socket.emit('update-text', id, text)
+    //         })
+    // }
 
     // // Function to change text "locally"
     // const changeText = (text: string) => {
@@ -148,21 +158,20 @@ const Room = () => {
                     readOnly={room == null}
                     // On change just change the room text for now
                     onChange={(e) => {
-                        // changeText(e.target.value)
-                        setTextState(e.target.value)
+                        updateText(e.target.value)
                     }}
                 />
 
                 {/* <div className="bg-red-300 flex-grow m-10"> yo</div> */}
 
                 {/*  Save button */}
-                <button
+                {/* <button
                     className="bg-blue-500 hover:bg-blue-700 my-2 w-64 h-12 self-center text-white font-bold py-2 px-4 rounded"
                     onClick={() => save(textState, id as string)}
                     disabled={room == null}
                 >
                     Save
-                </button>
+                </button> */}
             </div>
         </div>
     )
