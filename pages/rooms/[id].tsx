@@ -59,12 +59,8 @@ const Room = () => {
             // log it
             console.log("Got update text from ws", text)
 
-            // // Set room
-            // let updatedRoom = room
-            // if (updatedRoom) {
-            //     updatedRoom.text = text
-            // }
-            // setRoom(updatedRoom)
+            // Update text
+            setTextState(text)
         })
     }
 
@@ -112,8 +108,8 @@ const Room = () => {
                 setRoom(data)
 
                 // // Emit update-text event
-                // console.log("Emitting update-text to room", id)
-                // socket.emit('update-text', id, text)
+                console.log("Emitting update-text to room", id)
+                socket.emit('update-text', id, text)
             })
     }
 

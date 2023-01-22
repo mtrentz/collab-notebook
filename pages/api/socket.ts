@@ -23,14 +23,14 @@ const SocketHandler = (
                 // Check if roomId
                 if (roomId) {
                     socket.join(roomId)
-                    console.log('User joined room', roomId)
+                    console.log('User', socket.id, 'joined room', roomId)
                 }
             })
 
             // Broadcast text update
             socket.on('update-text', (roomId, text) => {
                 // Log it
-                console.log('Text updated', text, "for room", roomId)
+                console.log('User', socket.id, 'updated text in room', roomId, 'to', text)
 
                 // Broadcast to room, not to sender
                 socket.to(roomId).emit('text-updated', text)
