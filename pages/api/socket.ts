@@ -42,15 +42,15 @@ const SocketHandler = (
                         text: text,
                     },
                 })
-                    .then((room) => {
+                    .then(() => {
                         console.log('Saved text to database')
-                        // Broadcast to room, not to sender
-                        socket.to(roomId).emit('text-updated', text)
                     })
-                    .catch((err) => {
+                    .catch((err: any) => {
                         console.log('Error saving text to database', err)
                     })
 
+                // Broadcast to room, not to sender
+                socket.to(roomId).emit('text-updated', text)
             })
         })
 
