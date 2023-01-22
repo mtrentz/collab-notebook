@@ -3,6 +3,8 @@ import { useRouter } from 'next/router'
 import { io } from 'socket.io-client'
 let socket: any
 
+import type { RoomUsers } from '../../types'
+
 const Room = () => {
     // TODO: Use react-query to fetch data
 
@@ -11,9 +13,9 @@ const Room = () => {
     // Get id from url
     const { id } = router.query
 
-    // const [room, setRoom] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [text, setText] = useState<string>('')
+    const [users, setUsers] = useState<RoomUsers>({})
 
     const getRoomById = (id: string) => {
         // Make GET request to /api/rooms/:id
@@ -54,6 +56,37 @@ const Room = () => {
             // Update text
             setText(text)
         })
+
+        // Listen for changes in mouse position
+        socket.on('mouse-updated', (users: RoomUsers) => {
+            // log it
+            console.log("Got mouse position from ws", users)
+
+            // Update users
+            setUsers(users)
+        })
+    }
+
+    // Function to handle mousemove event
+    const handleMouseMove = (e: MouseEvent) => {
+        if (id) {
+            // Check if socket id in users, if so
+            // update the position, else add it
+            if (users[socket.id]) {
+                // Update position
+                users[socket.id].mouseX = e.clientX
+                users[socket.id].mouseY = e.clientY
+            }
+            else {
+                // Add user
+                users[socket.id] = {
+                    mouseX: e.clientX,
+                    mouseY: e.clientY
+                }
+            }
+
+            socket.emit('update-mouse', id, users)
+        }
     }
 
     // Get room on mount
@@ -67,7 +100,24 @@ const Room = () => {
         } else {
             setError("Room doesn't exist")
         }
+
+        // Add mousemove event listener
+        window.addEventListener('mousemove', handleMouseMove)
+
+        // Remove mousemove event listener
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove)
+        }
     }, [id])
+
+
+    // Draw users
+    useEffect(() => {
+        // Loop over user and log it for now
+        for (const [id, user] of Object.entries(users)) {
+            console.log(id, user)
+        }
+    }, [users])
 
     // Update function to change state and emit event
     const updateText = (text: string) => {

@@ -1,6 +1,7 @@
 import { Server } from 'socket.io'
 import { prisma } from '../../prisma/client'
 
+import type { RoomUsers } from '../../types'
 
 const SocketHandler = (
     req: any,
@@ -51,6 +52,15 @@ const SocketHandler = (
 
                 // Broadcast to room, not to sender
                 socket.to(roomId).emit('text-updated', text)
+            })
+
+            // Broadcast mouse update
+            socket.on('update-mouse', (roomId, roomUsers: RoomUsers) => {
+                // Log that received mouse update
+                console.log('User', socket.id, 'updated mouse in room', roomId)
+
+                // Broadcast roomUsers to room, not to sender
+                socket.to(roomId).emit('mouse-updated', roomUsers)
             })
         })
 
