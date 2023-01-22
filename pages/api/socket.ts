@@ -1,6 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next'
 import { Server } from 'socket.io'
-// Import req and res types from socket io
 
 
 const SocketHandler = (
@@ -21,7 +19,7 @@ const SocketHandler = (
             })
 
             // Join room
-            socket.on('join-room', (roomId) => {
+            socket.on('join', (roomId) => {
                 // Check if roomId
                 if (roomId) {
                     socket.join(roomId)
@@ -30,11 +28,11 @@ const SocketHandler = (
             })
 
             // Broadcast text update
-            socket.on('update-text', (text, roomId) => {
+            socket.on('update-text', (roomId, text) => {
                 // Log it
-                console.log('Text updated', text)
+                console.log('Text updated', text, "for room", roomId)
 
-                // Broadcast to room
+                // Broadcast to room, not to sender
                 socket.to(roomId).emit('text-updated', text)
             })
         })

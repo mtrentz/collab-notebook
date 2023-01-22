@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import Notepad from '@/components/Notepad'
 
 // Socket io stuff
 import { io } from 'socket.io-client'
@@ -22,6 +21,7 @@ const Room = () => {
 
     const [room, setRoom] = useState<Room | null>(null)
     const [error, setError] = useState<string | null>(null)
+    const [textState, setTextState] = useState<string>('')
 
     const getRoomById = (id: string) => {
         // Make GET request to /api/rooms/:id
@@ -44,7 +44,7 @@ const Room = () => {
     }
 
     const socketInitializer = async () => {
-        await fetch('/api/socket')
+        await fetch('/api/socket/')
         socket = io()
 
         socket.on('connect', () => {
@@ -52,19 +52,19 @@ const Room = () => {
         })
 
         // Join room
-        socket.emit('join-room', id)
+        socket.emit('join', id)
 
         // Listen for changes of update-text
         socket.on('text-updated', (text: string) => {
             // log it
             console.log("Got update text from ws", text)
 
-            // Set room
-            let updatedRoom = room
-            if (updatedRoom) {
-                updatedRoom.text = text
-            }
-            setRoom(updatedRoom)
+            // // Set room
+            // let updatedRoom = room
+            // if (updatedRoom) {
+            //     updatedRoom.text = text
+            // }
+            // setRoom(updatedRoom)
         })
     }
 
@@ -85,7 +85,15 @@ const Room = () => {
         }
     }, [id])
 
+    // Update text state when room text changes
+    useEffect(() => {
+        if (room) {
+            setTextState(room.text)
+        }
+    }, [room])
 
+
+    // Save text to database
     const save = (text: string, id: string) => {
         // PUT request to /api/rooms/:id
         fetch(`/api/rooms/${id}`, {
@@ -103,16 +111,23 @@ const Room = () => {
                 // Set room
                 setRoom(data)
 
-                // Emit update-text event
-                console.log("Emitting update-text")
-                socket.emit('update-text', text, id)
+                // // Emit update-text event
+                // console.log("Emitting update-text to room", id)
+                // socket.emit('update-text', id, text)
             })
     }
 
+    // // Function to change text "locally"
+    // const changeText = (text: string) => {
+    //     let upatedRoom = room
+    //     if (upatedRoom) {
+    //         upatedRoom.text = text
+    //     }
+    //     setRoom(upatedRoom)
+    // }
 
-    return (
-        // Show error if error
-        error ? (
+    if (error) {
+        return (
             <div className="flex-grow">
                 <div className="flex flex-col gap-4 items-center justify-center min-h-screen py-2">
                     <h1 className="text-2xl font-bold">{error}</h1>
@@ -124,19 +139,38 @@ const Room = () => {
                     </button>
                 </div>
             </div>
-        ) : (
-            <div className="flex-grow w-screen">
-                {/* // Show notepad */}
-                <Notepad
-                    id={room?.id || ''}
-                    text={room?.text || ''}
-                    saveText={save}
-                    // Editable if room loaded (not null or undefined)
-                    editable={room != null}
-                />
-            </div>
         )
+    }
+
+    return (
+        <div className="flex-grow w-screen">
+            <div className="flex flex-col h-full">
+                {/*  Large text area thats writable */}
+                <textarea
+                    className="flex-grow m-2 p-4 text-2xl font-mono bg-white rounded-lg resize-none focus:outline-0"
+                    value={textState}
+                    readOnly={room == null}
+                    // On change just change the room text for now
+                    onChange={(e) => {
+                        // changeText(e.target.value)
+                        setTextState(e.target.value)
+                    }}
+                />
+
+                {/* <div className="bg-red-300 flex-grow m-10"> yo</div> */}
+
+                {/*  Save button */}
+                <button
+                    className="bg-blue-500 hover:bg-blue-700 my-2 w-64 h-12 self-center text-white font-bold py-2 px-4 rounded"
+                    onClick={() => save(textState, id as string)}
+                    disabled={room == null}
+                >
+                    Save
+                </button>
+            </div>
+        </div>
     )
+
 }
 
 export default Room
